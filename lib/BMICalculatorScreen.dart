@@ -1,3 +1,5 @@
+import 'package:bmi_calculator_app/BMIModel.dart';
+import 'package:bmi_calculator_app/ResultScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -8,6 +10,9 @@ class BMICalculatorScreen extends StatefulWidget {
 
 class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
   double _heightOfUser = 100.0;
+  double _weightOfUser = 40.0;
+  double _bmi = 0;
+  late BMIModel _bmiModel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +60,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.only(left: 16, right: 16),
                 child: Slider(
                   min: 80.0,
                   max: 250.0,
@@ -66,9 +71,103 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   },
                   value: _heightOfUser,
                   divisions: 100,
-                  activeColor: Colors.red,
+                  activeColor: Colors.pink,
                   label: "$_heightOfUser",
                 ),
+              ),
+              Text(
+                "$_heightOfUser cm",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(
+                height: 23,
+              ),
+              Text(
+                "weight (kg)",
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                  fontSize: 25,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 16, right: 16),
+                child: Slider(
+                  min: 30.0,
+                  max: 120.0,
+                  onChanged: (weight) {
+                    setState(() {
+                      _weightOfUser = weight;
+                    });
+                  },
+                  value: _weightOfUser,
+                  divisions: 100,
+                  activeColor: Colors.pink,
+                  label: "$_weightOfUser",
+                ),
+              ),
+              Text(
+                "$_weightOfUser kg",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Container(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _bmi = _weightOfUser /
+                          ((_heightOfUser / 100) * (_heightOfUser / 100));
+                      if (_bmi >= 18.5 && _bmi <= 25) {
+                        _bmiModel = BMIModel(
+                            bmi: _bmi,
+                            isNormal: true,
+                            comments: "You are healthy and fit");
+                      } else if (_bmi < 18.5) {
+                        _bmiModel = BMIModel(
+                            bmi: _bmi,
+                            isNormal: false,
+                            comments: "You are underweight");
+                      } else if (_bmi > 25 && _bmi <= 30) {
+                        _bmiModel = BMIModel(
+                            bmi: _bmi,
+                            isNormal: false,
+                            comments: "You are Overweighted");
+                      } else {
+                        _bmiModel = BMIModel(
+                            bmi: _bmi,
+                            isNormal: false,
+                            comments: "You are Obesed");
+                      }
+                    });
+
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ResultScreen(
+                                  bmiModel: _bmiModel,
+                                )));
+                  },
+                  icon: Icon(
+                    Icons.favorite,
+                    color: Colors.red,
+                  ),
+                  label: Text(
+                    "CALCULATE",
+                    style: TextStyle(color: Colors.pink),
+                  ),
+                ),
+                width: double.infinity,
+                padding: EdgeInsets.only(left: 16, right: 16),
               )
             ]),
       )),
